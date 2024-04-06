@@ -1,19 +1,19 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import 'dotenv/config'
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 
+// rest object 
 const server = express();
 let PORT = 3000;
 
 server.use(express.json())
 
-mongoose.connect(process.env.DB_LOCATION, {
-    autoIndex: true
-});
-server.post('/signup', (req, res)=>{
-    console.log(req.body);
-    return res.json(req.body)
-})
+// db connection
+connectDB();
+
+// routes 
+server.use('/', authRoutes);
 
 server.listen(PORT, ()=>{
     console.log('Listening on port ->', PORT);

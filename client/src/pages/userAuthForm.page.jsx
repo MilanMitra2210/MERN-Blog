@@ -8,6 +8,7 @@ import { Toaster, toast } from 'react-hot-toast'
 import axios from 'axios'
 import { storeInSession } from '../common/session'
 import { UserContext } from '../App'
+import { authWithGoogle } from '../common/firebase'
 
 const UserAuthForm = ({ type }) => {
   const { userAuth: { access_token }, setUserAuth } = useContext(UserContext);
@@ -46,6 +47,20 @@ const UserAuthForm = ({ type }) => {
     if (Object.keys(validationErrors).length === 0) {
       userAuthThroughServer(serverRoute, formData);
     }
+  }
+  const handleGoogleAuth = (e) => {
+    e.preventDefault();
+    authWithGoogle().then(user => {
+      console.log(user);
+      let serverRoute = '/google-auth';
+      let formData = {
+        access_token: user.accessToken
+      }
+      userAuthThroughServer(serverRoute, formData);
+    }).catch(err => {
+      toast.error('Troble Logging through Google');
+      console.log(err);
+    })
   }
   return (
     access_token ?
@@ -97,7 +112,9 @@ const UserAuthForm = ({ type }) => {
               <p>or</p>
               <hr className='w-1/2 border-black' />
             </div>
-            <button className='btn-dark flex items-center justify-center gap-4 w-full sm:w-90 md:w-80 lg:w-72 xl:w-64 mx-auto'>
+            <button className='btn-dark flex items-center justify-center gap-4 w-full sm:w-90 md:w-80 lg:w-72 xl:w-64 mx-auto'
+              onClick={handleGoogleAuth}
+            >
               <img src={googleIcon} className='w-5' />
               continue with google
             </button>
